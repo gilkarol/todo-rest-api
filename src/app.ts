@@ -20,11 +20,6 @@ app.use(
 	})
 )
 
-app.use((req:any, res: any, next:any) => {
-	const error: handleError = new Error('test')
-	error.status = 400
-})
-
 app.use(json())
 app.use('/auth', authRoutes)
 app.use('/todo', todoRoutes)
