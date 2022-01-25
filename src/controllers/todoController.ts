@@ -6,7 +6,7 @@ export const getTodos = async (req: any, res: any, next: any) => {
 	const page: number = +req.query.page || 1
 	const todosPerPage: number = +req.body.todosPerPage || 5
 	try {
-		const todos = await Todo.find().skip(page - 1).limit(todosPerPage)
+		const todos = await Todo.find().skip((page - 1) * todosPerPage).limit(todosPerPage)
 		res.status(200).json({
 			message: 'Todos have been found successfully!',
 			todos: todos,
