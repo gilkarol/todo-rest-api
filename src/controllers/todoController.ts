@@ -1,6 +1,6 @@
+import handleError from '../models/error'
 import Todo from '../models/todo'
 import User from '../models/user'
-
 
 export const getTodos = async (req: any, res: any, next: any) => {
 	try {
@@ -10,8 +10,7 @@ export const getTodos = async (req: any, res: any, next: any) => {
 			todos: todos,
 		})
 	} catch (err) {
-		res.status(303)
-		throw err
+		next(err)
 	}
 }
 
@@ -30,8 +29,7 @@ export const postTodo = async (req: any, res: any, next: any) => {
 			todo: todo,
 		})
 	} catch (err) {
-		res.status = 404
-		throw err
+		next(err)
 	}
 }
 
@@ -41,12 +39,17 @@ export const deleteTodo = async (req: any, res: any, next: any) => {
 	try {
 		const todo = await Todo.findById(todoId)
 		const creatorId = todo.creatorId
-		if (creatorId.toString() !== userId.toString())
-			throw new Error('This user is not the creator of todo')
+		if (creatorId.toString() !== userId.toString()) {
+			const error: handleError = new Error(
+				'This user is not the creator of todo!'
+			)
+			error.status = 422
+			throw error
+		}
 		await Todo.findByIdAndRemove(todoId)
 		res.status(200).json({ message: 'Todo has been deleted successfully!' })
 	} catch (err) {
-		throw err
+		next(err)
 	}
 }
 
@@ -58,8 +61,13 @@ export const patchTodo = async (req: any, res: any, next: any) => {
 	try {
 		const todo = await Todo.findById(todoId)
 		const creatorId: string = todo.creatorId
-		if (creatorId.toString() !== userId.toString())
-			throw new Error('This user is not the creator of todo')
+		if (creatorId.toString() !== userId.toString()) {
+			const error: handleError = new Error(
+				'This user is not the creator of todo!'
+			)
+			error.status = 422
+			throw error
+		}
 		await Todo.findOneAndUpdate(
 			{ _id: todoId },
 			{
@@ -70,7 +78,6 @@ export const patchTodo = async (req: any, res: any, next: any) => {
 			message: 'Todo has been updated successfully!',
 		})
 	} catch (err) {
-		console.log(res.status)
-		throw err
+		next(err)
 	}
 }

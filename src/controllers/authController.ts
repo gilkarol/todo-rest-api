@@ -3,6 +3,7 @@ import { sign } from 'jsonwebtoken'
 import { validationResult } from 'express-validator'
 
 import User from '../models/user'
+import handleError from '../models/error'
 
 export const signup = async (req: any, res: any, next: any) => {
 	const name = req.body.name
@@ -11,12 +12,18 @@ export const signup = async (req: any, res: any, next: any) => {
 
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
-		throw new Error('Validation failed!')
+		const error: handleError = new Error('Email already exists!')
+		error.status = 422
+		throw error
 	}
 
 	try {
 		const emailExist = await User.findOne({ email: email })
-		if (emailExist) throw new Error('Email already exists!')
+		if (emailExist) {
+			const error: handleError = new Error('Email already exists!')
+			error.status = 409
+			throw error
+		}
 
 		const hashedPassword = await hash(password, 12)
 		const user = new User({
@@ -29,7 +36,7 @@ export const signup = async (req: any, res: any, next: any) => {
 			message: 'User created successfully!',
 		})
 	} catch (err) {
-		throw err
+		next(err)
 	}
 }
 
@@ -39,15 +46,25 @@ export const login = async (req: any, res: any, next: any) => {
 
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
-		throw new Error('Validation failed!')
+		const error: handleError = new Error('Email already exists!')
+		error.status = 422
+		throw error
 	}
 
 	try {
 		const user = await User.findOne({ email: email })
-		if (!user) throw new Error('User with this email does not exist!')
+		if (!user) {
+			const error: handleError = new Error('This email does not exist!')
+			error.status = 404
+			throw error
+		}
 
 		const isEqual = await compare(password, user.password)
-		if (!isEqual) throw new Error('Password does not match!')
+		if (!isEqual) {
+			const error: handleError = new Error('Passwords does not match!')
+			error.status = 422
+			throw error
+		}
 		const token = sign(
 			{ email: user.email, userId: user._id.toString() },
 			'secrettoken',
@@ -55,6 +72,6 @@ export const login = async (req: any, res: any, next: any) => {
 		)
 		res.status(200).json({ message: 'Successfully logged in!', token: token })
 	} catch (err) {
-		throw err
+		next(err)
 	}
 }

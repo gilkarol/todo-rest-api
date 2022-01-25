@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 
 import todoRoutes from './routes/todo'
 import authRoutes from './routes/auth'
+import handleError from './models/error'
 
 dotenv.config({ path: './.env' })
 
@@ -19,15 +20,19 @@ app.use(
 	})
 )
 
+app.use((req:any, res: any, next:any) => {
+	const error: handleError = new Error('test')
+	error.status = 400
+})
+
 app.use(json())
 app.use('/auth', authRoutes)
 app.use('/todo', todoRoutes)
 
-app.use((error: any, req: any, res: any, next: any) => {
-	const status = error.status || 500
+app.use((error: handleError, req: any, res: any, next: any) => {
+	const statusCode = error.status || 500
 	const message = error.message
-	const data = error.data
-	res.status(status).json({ message: message, data: data })
+	res.status(statusCode).json({ message: message })
 })
 
 mongoose
