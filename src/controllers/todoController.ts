@@ -6,7 +6,9 @@ export const getTodos = async (req: any, res: any, next: any) => {
 	const page: number = +req.query.page || 1
 	const todosPerPage: number = +req.body.todosPerPage || 5
 	try {
-		const todos = await Todo.find().skip((page - 1) * todosPerPage).limit(todosPerPage)
+		const todos = await Todo.find()
+			.skip((page - 1) * todosPerPage)
+			.limit(todosPerPage)
 		res.status(200).json({
 			message: 'Todos have been found successfully!',
 			todos: todos,
@@ -19,13 +21,15 @@ export const getTodos = async (req: any, res: any, next: any) => {
 export const postTodo = async (req: any, res: any, next: any) => {
 	const userId: string = req.userId
 	const todoText: string = req.body.text
-	const todo = new Todo({
+	const newTodo = new Todo({
 		text: todoText,
 		creatorId: req.userId,
 	})
 	try {
-		await todo.save()
-		await User.findById(userId)
+		const todo = await newTodo.save()
+		const user = await User.findById(userId)
+		user.todos.push(todo)
+		await user.save()
 		res.status(201).json({
 			message: 'Todo has been created successfully!',
 			todo: todo,
