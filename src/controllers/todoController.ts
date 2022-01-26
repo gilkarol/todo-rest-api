@@ -7,7 +7,6 @@ export const getTodos = async (req: any, res: any, next: any) => {
 	const todosPerPage: number = +req.body.todosPerPage || 5
 	try {
 		const countTodos = await Todo.countDocuments()
-		console.log(countTodos)
 		const todos = await Todo.find()
 			.skip((page - 1) * todosPerPage)
 			.limit(todosPerPage)
@@ -16,8 +15,7 @@ export const getTodos = async (req: any, res: any, next: any) => {
 			todos: todos,
 			numberOfTodos: countTodos,
 			hasPreviousPage: page > 1,
-			hasNextPage: countTodos > (page * todosPerPage)
-
+			hasNextPage: countTodos > page * todosPerPage,
 		})
 	} catch (err) {
 		next(err)
