@@ -14,7 +14,10 @@ export const getTodos = async (req: any, res: any, next: any) => {
 		res.status(200).json({
 			message: 'Todos have been found successfully!',
 			todos: todos,
-			numberOfTodos: countTodos
+			numberOfTodos: countTodos,
+			hasPreviousPage: page > 1,
+			hasNextPage: countTodos > (page * todosPerPage)
+
 		})
 	} catch (err) {
 		next(err)
@@ -56,6 +59,9 @@ export const deleteTodo = async (req: any, res: any, next: any) => {
 			throw error
 		}
 		await Todo.findByIdAndRemove(todoId)
+		const user = await User.findById(userId)
+		user.todos.pull(todo)
+		await user.save()
 		res.status(200).json({ message: 'Todo has been deleted successfully!' })
 	} catch (err) {
 		next(err)
