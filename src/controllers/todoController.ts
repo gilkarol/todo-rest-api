@@ -2,7 +2,7 @@ import handleError from '../models/error'
 import Todo from '../models/todo'
 import User from '../models/user'
 
-export const getTodos = async (req: any, res: any, next: any) => {
+export const getAllTodos = async (req: any, res: any, next: any) => {
 	const page: number = +req.query.page || 1
 	const todosPerPage: number = +req.body.todosPerPage || 5
 	try {
@@ -12,6 +12,27 @@ export const getTodos = async (req: any, res: any, next: any) => {
 			.limit(todosPerPage)
 		res.status(200).json({
 			message: 'Todos have been found successfully!',
+			todos: todos,
+			numberOfTodos: countTodos,
+			hasPreviousPage: page > 1,
+			hasNextPage: countTodos > page * todosPerPage,
+		})
+	} catch (err) {
+		next(err)
+	}
+}
+
+export const getUserTodos = async (req: any, res: any, next: any) => {
+	const userId = req.userId
+	const page: number = +req.query.page || 1
+	const todosPerPage: number = +req.body.todosPerPage || 5
+	try {
+		const countTodos = await Todo.countDocuments({creatorId: userId})
+		const todos = await Todo.find({ creatorId: userId })
+			.skip((page - 1) * todosPerPage)
+			.limit(todosPerPage)
+		res.status(200).json({
+			message: `User's todos have been found successfully!`,
 			todos: todos,
 			numberOfTodos: countTodos,
 			hasPreviousPage: page > 1,

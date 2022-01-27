@@ -1,11 +1,13 @@
 import { Router } from 'express'
 
-import { getTodos, postTodo, deleteTodo, patchTodo } from '../controllers/todoController'
+import { getAllTodos, postTodo, deleteTodo, patchTodo, getUserTodos } from '../controllers/todoController'
 import isAuth from '../middleware/is-auth'
 
 const router = Router()
 
-router.get('/', isAuth, getTodos)
+router.get('/', isAuth, getAllTodos)
+
+router.get('/user', isAuth, getUserTodos)
 
 router.post('/', isAuth, postTodo)
 
