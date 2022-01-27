@@ -67,7 +67,7 @@ export const login = async (req: any, res: any, next: any) => {
 		}
 		const token = sign(
 			{ email: user.email, userId: user._id.toString() },
-			'secrettoken',
+			process.env.JWT_TOKEN as string,
 			{ expiresIn: '1h' }
 		)
 		res.status(200).json({ message: 'Successfully logged in!', token: token })
