@@ -4,8 +4,9 @@ import { validationResult } from 'express-validator'
 
 import User from '../models/user'
 import handleError from '../models/error'
+import { NextFunction, Response } from 'express'
 
-export const signup = async (req: any, res: any, next: any) => {
+export const signup = async (req: any, res: Response, next: NextFunction) => {
 	const name = req.body.name
 	const email = req.body.email
 	const password = req.body.password
@@ -40,7 +41,7 @@ export const signup = async (req: any, res: any, next: any) => {
 	}
 }
 
-export const login = async (req: any, res: any, next: any) => {
+export const login = async (req: any, res: Response, next: NextFunction) => {
 	const email = req.body.email
 	const password = req.body.password
 

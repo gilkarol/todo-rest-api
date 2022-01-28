@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { NextFunction, Response } from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import { json } from 'body-parser'
@@ -24,7 +24,7 @@ app.use(json())
 app.use('/auth', authRoutes)
 app.use('/todo', todoRoutes)
 
-app.use((error: handleError, req: any, res: any, next: any) => {
+app.use((error: handleError, req: any, res: Response, next: NextFunction) => {
 	const statusCode = error.status || 500
 	const message = error.message
 	res.status(statusCode).json({ message: message })

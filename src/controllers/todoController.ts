@@ -1,8 +1,9 @@
+import { NextFunction, Response } from 'express'
 import handleError from '../models/error'
 import Todo from '../models/todo'
 import User from '../models/user'
 
-export const getAllTodos = async (req: any, res: any, next: any) => {
+export const getAllTodos = async (req: any, res: Response, next: NextFunction) => {
 	const page: number = +req.query.page || 1
 	const todosPerPage: number = +req.body.todosPerPage || 5
 	try {
@@ -22,7 +23,7 @@ export const getAllTodos = async (req: any, res: any, next: any) => {
 	}
 }
 
-export const getUserTodos = async (req: any, res: any, next: any) => {
+export const getUserTodos = async (req: any, res: Response, next: NextFunction) => {
 	const userId = req.userId
 	const page: number = +req.query.page || 1
 	const todosPerPage: number = +req.body.todosPerPage || 5
@@ -43,7 +44,7 @@ export const getUserTodos = async (req: any, res: any, next: any) => {
 	}
 }
 
-export const postTodo = async (req: any, res: any, next: any) => {
+export const postTodo = async (req: any, res: Response, next: NextFunction) => {
 	const userId: string = req.userId
 	const todoText: string = req.body.text
 	const newTodo = new Todo({
@@ -64,7 +65,7 @@ export const postTodo = async (req: any, res: any, next: any) => {
 	}
 }
 
-export const deleteTodo = async (req: any, res: any, next: any) => {
+export const deleteTodo = async (req: any, res: Response, next: NextFunction) => {
 	const userId: string = req.userId
 	const todoId: string = req.params.todoId
 	try {
@@ -87,7 +88,7 @@ export const deleteTodo = async (req: any, res: any, next: any) => {
 	}
 }
 
-export const patchTodo = async (req: any, res: any, next: any) => {
+export const patchTodo = async (req: any, res: Response, next: NextFunction) => {
 	const todoId: string = req.params.todoId
 	const userId: string = req.userId
 	const todoText = req.body.text

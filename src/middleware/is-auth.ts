@@ -1,6 +1,7 @@
+import { NextFunction, Response } from 'express'
 import { verify } from 'jsonwebtoken'
 
-export default (req: any, res: any, next: any) => {
+export default (req: any, res: Response, next: NextFunction) => {
 	const hashedToken: string = req.get('Authorization').split(' ')[1]
 
 	const token = verify(hashedToken, process.env.JWT_TOKEN as string) as {
