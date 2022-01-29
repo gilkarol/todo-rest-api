@@ -1,10 +1,16 @@
 import { NextFunction, Response } from 'express'
-import handleError from '../models/error'
+
+import { Err } from '../util/interfaces'
 import Todo from '../models/todo'
 import User from '../models/user'
+import { Req } from '../util/interfaces'
 
-export const getAllTodos = async (req: any, res: Response, next: NextFunction) => {
-	const page: number = +req.query.page || 1
+export const getAllTodos = async (
+	req: Req,
+	res: Response,
+	next: NextFunction
+) => {
+	const page: number = +req.query.page! || 1
 	const todosPerPage: number = +req.body.todosPerPage || 5
 	try {
 		const countTodos = await Todo.countDocuments()
@@ -23,12 +29,16 @@ export const getAllTodos = async (req: any, res: Response, next: NextFunction) =
 	}
 }
 
-export const getUserTodos = async (req: any, res: Response, next: NextFunction) => {
-	const userId = req.userId
-	const page: number = +req.query.page || 1
+export const getUserTodos = async (
+	req: Req,
+	res: Response,
+	next: NextFunction
+) => {
+	const userId = +req.userId!
+	const page: number = +req.query.page! || 1
 	const todosPerPage: number = +req.body.todosPerPage || 5
 	try {
-		const countTodos = await Todo.countDocuments({creatorId: userId})
+		const countTodos = await Todo.countDocuments({ creatorId: userId })
 		const todos = await Todo.find({ creatorId: userId })
 			.skip((page - 1) * todosPerPage)
 			.limit(todosPerPage)
@@ -44,8 +54,8 @@ export const getUserTodos = async (req: any, res: Response, next: NextFunction) 
 	}
 }
 
-export const postTodo = async (req: any, res: Response, next: NextFunction) => {
-	const userId: string = req.userId
+export const postTodo = async (req: Req, res: Response, next: NextFunction) => {
+	const userId: number = +req.userId!
 	const todoText: string = req.body.text
 	const newTodo = new Todo({
 		text: todoText,
@@ -65,14 +75,18 @@ export const postTodo = async (req: any, res: Response, next: NextFunction) => {
 	}
 }
 
-export const deleteTodo = async (req: any, res: Response, next: NextFunction) => {
-	const userId: string = req.userId
+export const deleteTodo = async (
+	req: Req,
+	res: Response,
+	next: NextFunction
+) => {
+	const userId: number = +req.userId!
 	const todoId: string = req.params.todoId
 	try {
 		const todo = await Todo.findById(todoId)
 		const creatorId = todo.creatorId
 		if (creatorId.toString() !== userId.toString()) {
-			const error: handleError = new Error(
+			const error: Err = new Error(
 				'This user is not the creator of todo!'
 			)
 			error.status = 422
@@ -88,16 +102,20 @@ export const deleteTodo = async (req: any, res: Response, next: NextFunction) =>
 	}
 }
 
-export const patchTodo = async (req: any, res: Response, next: NextFunction) => {
+export const patchTodo = async (
+	req: Req,
+	res: Response,
+	next: NextFunction
+) => {
 	const todoId: string = req.params.todoId
-	const userId: string = req.userId
-	const todoText = req.body.text
+	const userId: number = +req.userId!
+	const todoText: string = req.body.text
 
 	try {
 		const todo = await Todo.findById(todoId)
 		const creatorId: string = todo.creatorId
 		if (creatorId.toString() !== userId.toString()) {
-			const error: handleError = new Error(
+			const error: Err = new Error(
 				'This user is not the creator of todo!'
 			)
 			error.status = 422

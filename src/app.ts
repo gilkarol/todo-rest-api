@@ -6,7 +6,7 @@ import dotenv from 'dotenv'
 
 import todoRoutes from './routes/todo'
 import authRoutes from './routes/auth'
-import handleError from './models/error'
+import { Err, Req } from './util/interfaces'
 
 dotenv.config({ path: './.env' })
 
@@ -24,7 +24,7 @@ app.use(json())
 app.use('/auth', authRoutes)
 app.use('/todo', todoRoutes)
 
-app.use((error: handleError, req: any, res: Response, next: NextFunction) => {
+app.use((error: Err, req: Req, res: Response, next: NextFunction) => {
 	const statusCode = error.status || 500
 	const message = error.message
 	res.status(statusCode).json({ message: message })
