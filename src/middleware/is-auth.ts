@@ -15,8 +15,10 @@ export default (req: Req, res: Response, next: NextFunction) => {
 		email: string
 		userId: string
 	}
-	if (!token) {
-		throw new Error('Not authenticated')
+	if (!token.userId) {
+		const error: Err = new Error('Not authenticated!')
+		error.status = 401
+		throw error
 	}
 	req.userId = +token.userId
 	next()
